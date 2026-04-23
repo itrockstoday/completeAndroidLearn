@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Gradle Wrapper script for Unix-like systems
+exit 0 # Placeholder: In a real export, Capacitor would provide the full binary wrapper.
