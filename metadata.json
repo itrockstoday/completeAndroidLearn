@@ -1,0 +1,6 @@
+{
+  "name": "Retro Terminal Shell",
+  "description": "A high-performance retro-styled terminal emulator with a built-in shell simulator and scanline effects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

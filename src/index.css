@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-retro: "VT323", monospace;
+  
+  --color-terminal-bg: #080808;
+  --color-terminal-green: #00FF41;
+  --color-terminal-amber: #FFB000;
+  --color-terminal-dim: rgba(0, 255, 65, 0.4);
+}
+
+@layer base {
+  body {
+    @apply bg-[#080808] overflow-hidden text-terminal-green;
+  }
+}
+
+@layer components {
+  .crt-screen {
+    position: relative;
+    background: var(--color-terminal-bg);
+    overflow: hidden;
+  }
+
+  /* CRT Scanlines Overlay */
+  .crt-overlay-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.05;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+  }
+
+  /* CRT Vignette Overlay */
+  .crt-overlay-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    box-shadow: inset 0 0 120px rgba(0,0,0,1);
+  }
+
+  .scanline-anim {
+    width: 100%;
+    height: 100px;
+    z-index: 11;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 255, 65, 0.05) 10%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    opacity: 0.1;
+    position: absolute;
+    bottom: 100%;
+    animation: scanline 10s linear infinite;
+  }
+
+  @keyframes scanline {
+    0% { bottom: 100%; }
+    80% { bottom: 100%; }
+    100% { bottom: 0%; }
+  }
+
+  .terminal-glow {
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+  }
+
+  .terminal-glow-amber {
+    text-shadow: 0 0 5px rgba(255, 176, 0, 0.5);
+  }
+}
+
+
