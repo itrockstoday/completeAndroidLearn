@@ -20,7 +20,6 @@ android {
         }
 
         python {
-            buildPython = "/usr/bin/python3"
             version = "3.12"
             pip {
                 install("requests")
