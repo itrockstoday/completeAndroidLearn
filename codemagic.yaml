@@ -13,26 +13,19 @@ workflows:
         script: npm run build
       - name: Capacitor Sync
         script: npx cap sync android
-      - name: Build Android APK
+      - name: Build Android App
         script: |
-          set -e
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-      - name: Locate and Export Artifacts
+          mkdir -p ../artifacts
+          find . -name "*.apk" -print
+          find app/build/outputs/apk/debug -name "*.apk" -exec cp {} ../artifacts/RetroTerminal.apk \;
+      - name: Export Artifacts
         script: |
-          mkdir -p artifacts
-          echo "Listing all generated APKs:"
-          find android/app/build/outputs -name "*.apk"
-          # Aggressively copy any debug APK found to the artifacts folder
-          find android/app/build/outputs/apk/debug -name "*.apk" -exec cp {} artifacts/RetroTerminal-Debug.apk \; || true
-          # Fallback: search the entire android directory if the standard path failed
-          if [ ! -f artifacts/RetroTerminal-Debug.apk ]; then
-            find android -name "*-debug.apk" -exec cp {} artifacts/RetroTerminal-Debug.apk \; || true
-          fi
+          ls -R artifacts
     artifacts:
       - artifacts/*.apk
-      - android/app/build/outputs/**/*.apk
     publishing:
       email:
         recipients:

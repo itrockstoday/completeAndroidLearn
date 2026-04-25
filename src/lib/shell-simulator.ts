@@ -85,11 +85,8 @@ export class ShellSimulator {
       setTimeout(() => {
         this.pythonLoaded = true;
         this.addSystemLine("[  OK  ] CHAQUOPY RUNTIME ATTACHED (PYTHON 3.12)");
-        this.addSystemLine("[ SYSTEM ] EXECUTING BOOT SEQUENCE...");
-        setTimeout(() => {
-          this.autoExecute();
-        }, 1000);
-      }, 1500);
+        this.autoExecute();
+      }, 500);
     } catch (e) {
       console.error("Failed to load game assets", e);
     }
