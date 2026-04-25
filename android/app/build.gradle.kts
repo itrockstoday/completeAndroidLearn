@@ -1,3 +1,5 @@
+import com.chaquo.python.android.*
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -19,7 +21,7 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
 
-        python {
+        extensions.configure<PythonCollectionExtension>("python") {
             version = "3.12"
             pip {
                 install("requests")

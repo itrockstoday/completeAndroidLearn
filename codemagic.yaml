@@ -13,10 +13,6 @@ workflows:
         script: npm run build
       - name: Capacitor Sync
         script: npx cap sync android
-      - name: Setup Gradle Wrapper
-        script: |
-          cd android
-          gradle wrapper
       - name: Build Android APK
         script: |
           set -e
