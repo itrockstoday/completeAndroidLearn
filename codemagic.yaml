@@ -18,7 +18,7 @@ workflows:
       - name: Build Android APK
         script: |
           cd android
-          gradle assembleDebug
+          gradle assembleDebug --stacktrace --info
     artifacts:
       - android/app/build/outputs/apk/debug/app-debug.apk
     publishing:
