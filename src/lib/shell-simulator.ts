@@ -65,7 +65,7 @@ export class ShellSimulator {
 
   constructor() {
     this.addSystemLine("Welcome to Alpine Terminal v3.18");
-    this.addSystemLine("CHAQUOPY V17.0 (PY3.12) BRIDGE - INITIALIZING...");
+    this.addSystemLine("CHAQUOPY V16.0.0 (PY3.12) BRIDGE - INITIALIZING...");
     this.addOutputLine("");
     this.addOutputLine("Type 'help' to see available commands.");
     this.addOutputLine("");

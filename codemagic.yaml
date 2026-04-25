@@ -13,23 +13,17 @@ workflows:
         script: npm run build
       - name: Capacitor Sync
         script: npx cap sync android
+      - name: Setup Gradle Wrapper
+        script: |
+          cd android
+          gradle wrapper
       - name: Build Android APK
         script: |
           set -e
           cd android
-          chmod +x gradlew || true
-          
-          # Use gradlew if jar exists, otherwise fallback to global gradle
-          if [ -f gradle/wrapper/gradle-wrapper.jar ]; then
-            echo "Using gradle-wrapper..."
-            ./gradlew clean :app:assembleDebug --stacktrace --no-daemon --info
-          else
-            echo "gradle-wrapper.jar missing, using global gradle..."
-            gradle clean :app:assembleDebug --stacktrace --no-daemon --info
-          fi
-          
-          echo "Build finished. List of all files in android/app/build:"
-          ls -R app/build || echo "Build directory not found"
+          chmod +x gradlew
+          ./gradlew clean :app:assembleDebug --stacktrace --no-daemon --info
+          echo "Build finished."
       - name: Locate Artifacts
         script: |
           echo "Scanning for all APKs..."
