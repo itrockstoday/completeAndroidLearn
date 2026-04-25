@@ -21,7 +21,7 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
 
-        extensions.configure<PythonCollectionExtension>("python") {
+        configure<com.chaquo.python.android.PythonExtension> {
             version = "3.12"
             pip {
                 install("requests")
