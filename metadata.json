@@ -1,6 +1,6 @@
 {
   "name": "Retro Terminal Shell",
-  "description": "A performance-optimized retro terminal emulator with integrated Chaquopy Python bridge, an auto-starting shell game, and Android Kiosk mode support.",
+  "description": "A performance-optimized retro terminal emulator with integrated Chaquopy Python bridge, an auto-starting shell game, and Android immersive mode support.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -15,14 +15,17 @@ workflows:
         script: npx cap sync android
       - name: Build Android App
         script: |
+          set -e
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
           mkdir -p ../artifacts
-          find . -name "*.apk" -print
-          find app/build/outputs/apk/debug -name "*.apk" -exec cp {} ../artifacts/RetroTerminal.apk \;
+          # Find any APK and copy it. Using broad search to be safe.
+          find . -type f -name "*.apk" -print -exec cp {} ../artifacts/RetroTerminal.apk \;
       - name: Export Artifacts
         script: |
+          set -e
+          echo "Build artifacts summary:"
           ls -R artifacts
     artifacts:
       - artifacts/*.apk
