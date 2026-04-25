@@ -18,11 +18,13 @@ workflows:
       - name: Build Android APK
         script: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          gradle assembleDebug
     artifacts:
-      - android/app/build/outputs/apk/**/*.apk
+      - android/app/build/outputs/apk/debug/app-debug.apk
     publishing:
       email:
         recipients:
           - jose@techbyjr.com
+        notify:
+          success: true
+          failure: true
