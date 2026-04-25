@@ -17,14 +17,28 @@ workflows:
         script: |
           set -e
           cd android
-          chmod +x gradlew
-          ./gradlew clean assembleDebug --stacktrace --no-daemon --info
+          chmod +x gradlew || true
+          
+          # Use gradlew if jar exists, otherwise fallback to global gradle
+          if [ -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "Using gradle-wrapper..."
+            ./gradlew clean :app:assembleDebug --stacktrace --no-daemon --info
+          else
+            echo "gradle-wrapper.jar missing, using global gradle..."
+            gradle clean :app:assembleDebug --stacktrace --no-daemon --info
+          fi
+          
+          echo "Build finished. List of all files in android/app/build:"
+          ls -R app/build || echo "Build directory not found"
       - name: Locate Artifacts
         script: |
-          echo "Scanning for APKs..."
+          echo "Scanning for all APKs..."
           find . -name "*.apk"
+          echo "Scanning for all AABs..."
+          find . -name "*.aab"
     artifacts:
-      - android/app/build/outputs/apk/**/*.apk
+      - "**/*.apk"
+      - "**/*.aab"
     publishing:
       email:
         recipients:
