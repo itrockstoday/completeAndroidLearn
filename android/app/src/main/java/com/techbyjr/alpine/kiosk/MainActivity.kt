@@ -23,16 +23,6 @@ class MainActivity : BridgeActivity() {
         if (!Python.isStarted()) {
             Python.start(AndroidPlatform(this))
         }
-        
-        // Enable Kiosk Mode (Lock Task Mode)
-        try {
-            val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            if (am.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
-                startLockTask()
-            }
-        } catch (e: Exception) {
-            // Log or handle error if needed
-        }
     }
 
     private fun hideSystemUI() {

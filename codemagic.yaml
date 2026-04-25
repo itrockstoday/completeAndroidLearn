@@ -18,17 +18,14 @@ workflows:
           set -e
           cd android
           chmod +x gradlew
-          ./gradlew clean :app:assembleDebug --stacktrace --no-daemon --info
-          echo "Build finished."
-      - name: Locate Artifacts
+          ./gradlew assembleDebug --no-daemon
+      - name: Export Artifacts
         script: |
-          echo "Scanning for all APKs..."
-          find . -name "*.apk"
-          echo "Scanning for all AABs..."
-          find . -name "*.aab"
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/debug/*.apk artifacts/RetroTerminal.apk || true
     artifacts:
-      - "**/*.apk"
-      - "**/*.aab"
+      - artifacts/*.apk
+      - android/app/build/outputs/apk/debug/*.apk
     publishing:
       email:
         recipients:
