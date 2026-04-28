@@ -1,38 +1,22 @@
 workflows:
-  android-apk-workflow:
-    name: Android APK Build
+  flutter-android-workflow:
+    name: Flutter Android Build
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     environment:
-      node: v22.14.0
+      flutter: stable
       java: 17
     scripts:
-      - name: Install dependencies
-        script: npm install
-      - name: Build web assets
-        script: npm run build
-      - name: Capacitor Sync
-        script: npx cap sync android
-      - name: Build Android App
+      - name: Flutter build APK
         script: |
-          set -e
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
-          mkdir -p ../artifacts
-          # Find any APK and copy it. Using broad search to be safe.
-          find . -type f -name "*.apk" -print -exec cp {} ../artifacts/RetroTerminal.apk \;
-      - name: Export Artifacts
-        script: |
-          set -e
-          echo "Build artifacts summary:"
-          ls -R artifacts
+          flutter pub get
+          flutter build apk --debug
+          mkdir -p artifacts
+          cp build/app/outputs/flutter-apk/app-debug.apk artifacts/RetroTerminal.apk
     artifacts:
       - artifacts/*.apk
     publishing:
       email:
         recipients:
           - jose@techbyjr.com
-        notify:
-          success: true
-          failure: true
+
