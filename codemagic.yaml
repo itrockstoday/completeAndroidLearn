@@ -10,11 +10,10 @@ workflows:
       - name: Flutter build APK
         script: |
           flutter pub get
-          # Inject the Flutter SDK path into local.properties so Gradle can find the plugins
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           flutter build apk --debug
           mkdir -p artifacts
-          cp build/app/outputs/flutter-apk/app-debug.apk artifacts/RetroTerminal.apk
+          find build/app/outputs/flutter-apk -name "*.apk" -exec cp {} artifacts/RetroTerminal.apk \;
     artifacts:
       - artifacts/*.apk
     publishing:
