@@ -1,7 +1,11 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id "org.jetbrains.kotlin.android"
+}
+
+flutter {
+    source "../../"
 }
 
 android {
@@ -16,10 +20,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
@@ -37,8 +37,6 @@ android {
     }
 }
 
-flutter {
-    source "../../"
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.ext.kotlin_version}"
 }
-
-dependencies {}
