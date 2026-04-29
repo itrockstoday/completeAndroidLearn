@@ -8,28 +8,46 @@ interface TerminalLine {
   type: LineType;
 }
 
+const TERMINAL_THEME = {
+  bg: '#0a0a0a',
+  text: '#33ff33',
+  input: '#ffffff',
+  system: '#fbbf24',
+  error: '#ef4444',
+  cursor: '#33ff33',
+};
+
 function App() {
   const [history, setHistory] = useState<TerminalLine[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [step, setStep] = useState<'boot' | 'login' | 'level1' | 'level2' | 'finished'>('boot');
-  const [userName, setUserName] = useState('');
+  const [isBooting, setIsBooting] = useState(true);
+  const [step, setStep] = useState<'login' | 'tutorial' | 'play' | 'finished'>('login');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (step === 'boot') {
-      const sequence = async () => {
-        addSystemLine("[  BOOT  ] INITIALIZING SS ALPINE CORE...");
-        await wait(800);
-        addSystemLine("[   OK   ] MEMORY CHUNKS MOUNTED");
-        await wait(500);
-        addSystemLine("[   OK   ] KERNEL ATTACHED (REACT WEBSHELL)");
-        await wait(1000);
-        addSystemLine("\n=== SS ALPINE LOGIN ===");
-        setStep('login');
-        addOutputLine("Identify yourself, Explorer:");
-      };
-      sequence();
-    }
+    const bootSequence = async () => {
+      const messages = [
+        "ROM OK",
+        "RAM TEST 640K OK",
+        "DRIVE A: READY",
+        "MOUNTING /DEV/SDA1...",
+        "RETRO OS V1.0.4 STARTING...",
+        "--------------------------",
+        "SYSTEM CORE: ONLINE",
+        "UI MODULE: LOADED",
+        "TERMINAL HANDLER: READY",
+      ];
+
+      for (const msg of messages) {
+        addSystemLine(msg);
+        await new Promise(r => setTimeout(r, Math.random() * 200 + 50));
+      }
+      setIsBooting(false);
+      addOutputLine("\nWelcome to RETRO TERMINAL CORE.");
+      addOutputLine("Identify yourself to begin the session.");
+    };
+    bootSequence();
   }, []);
 
   useEffect(() => {
@@ -37,8 +55,6 @@ function App() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [history]);
-
-  const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const addLine = (text: string, type: LineType) => {
     setHistory(prev => [...prev, { text, type }]);
@@ -50,120 +66,171 @@ function App() {
 
   const handleCommand = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBooting) return;
+    
     const cmd = inputValue.trim();
     if (!cmd) return;
 
     addInputLine(cmd);
     setInputValue('');
 
+    const lowerCmd = cmd.toLowerCase();
+
     if (step === 'login') {
-      setUserName(cmd);
-      setStep('level1');
-      addSystemLine(`\nWelcome, Captain ${cmd}.`);
-      addOutputLine("--- LEVEL 1: The Magic Map (Navigation) ---");
-      addOutputLine("CONCEPT: The computer is a Giant Tree. Folders are Branches.");
-      addOutputLine("EXPLAIN: We use 'ls' to see what is on our branch.");
-      addOutputLine("DEMO: Type 'ls' to look around.");
-    } else if (step === 'level1') {
-      if (cmd.toLowerCase() === 'ls') {
-        addOutputLine("Scanning directory...");
-        addOutputLine("explorer.txt  logs.db  secrets/  vault/");
-        addSystemLine("SUCCESS! Level 1 Complete.");
-        setStep('level2');
-        addOutputLine("\n--- LEVEL 2: The Toy Box (File Creation) ---");
-        addOutputLine("CONCEPT: Creating a file is like putting a toy in a box.");
-        addOutputLine("EXPLAIN: The 'touch' command creates a brand new file.");
-        addOutputLine("DEMO: Type 'touch badge.txt' to create a token.");
+      addSystemLine(`\nUser authorized: ${cmd.toUpperCase()}`);
+      addOutputLine("Initializing Kiosk Mode...");
+      addOutputLine("Type 'help' for available commands.");
+      setStep('play');
+    } else if (lowerCmd === 'help') {
+      addOutputLine("Available Commands:");
+      addOutputLine("  ls      - List files in current directory");
+      addOutputLine("  cat     - Read a file content");
+      addOutputLine("  whoami  - Show current user");
+      addOutputLine("  status  - Show system status");
+      addOutputLine("  clear   - Clear the terminal");
+    } else if (lowerCmd === 'ls') {
+      addOutputLine("drwx------  admin  staff  4096 Apr 29 02:25 .");
+      addOutputLine("drwxr-xr-x  root   root   4096 Apr 29 02:20 ..");
+      addOutputLine("-rw-r--r--  user   staff    42 Apr 29 02:25 welcome.txt");
+      addOutputLine("-rwxr-xr-x  user   staff  8192 Apr 29 02:30 secret_project");
+    } else if (lowerCmd === 'clear') {
+      setHistory([]);
+    } else if (lowerCmd === 'whoami') {
+      addOutputLine("User: Explorer");
+      addOutputLine("Role: Terminal Operator");
+    } else if (lowerCmd === 'status') {
+      addSystemLine("SYSTEM HEALTH: 100%");
+      addSystemLine("MEMORY USAGE: 12%");
+      addSystemLine("UPTIME: 00:04:22");
+    } else if (lowerCmd.startsWith('cat ')) {
+      const file = lowerCmd.split(' ')[1];
+      if (file === 'welcome.txt') {
+        addOutputLine("Welcome to the Retro Terminal Interface.");
+        addOutputLine("This is your kiosk for project RETRO_SHELL.");
       } else {
-        addOutputLine("Try again. You must navigate using 'ls'.");
+        addOutputLine(`Error: ${file} not found or access denied.`);
       }
-    } else if (step === 'level2') {
-      if (cmd.toLowerCase().startsWith('touch ')) {
-        addOutputLine(`File created: ${cmd.split(' ')[1] || 'unnamed'}`);
-        addSystemLine("SUCCESS! Level 2 Complete.");
-        addSystemLine(`\nMISSION COMPLETE, CAPTAIN ${userName.toUpperCase()}!`);
-        addOutputLine("You have mastered basic terminal navigation and creation.");
-        setStep('finished');
-      } else {
-        addOutputLine("Try again. Use 'touch [filename]'.");
-      }
-    } else if (step === 'finished') {
-      addOutputLine("Mission achieved. Terminal in passive mode.");
+    } else {
+      addOutputLine(`Command not found: ${cmd}`);
     }
   };
 
-  const getLineColor = (type: LineType) => {
-    switch (type) {
-      case 'input': return '#FFFFFF';
-      case 'output': return '#00FF00';
-      case 'system': return '#FFD700';
-      case 'error': return '#FF4444';
-      default: return '#00FF00';
-    }
+  const focusInput = () => {
+    if (inputRef.current) inputRef.current.focus();
   };
 
   return (
-    <div style={{
-      backgroundColor: 'black',
-      color: '#00FF00',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: '"Fira Code", monospace',
-      padding: '20px',
-      overflow: 'hidden',
-      position: 'relative'
-    }}>
-      {/* Scanline effect */}
+    <div 
+      onClick={focusInput}
+      style={{
+        backgroundColor: TERMINAL_THEME.bg,
+        color: TERMINAL_THEME.text,
+        height: '100vh',
+        width: '100vw',
+        padding: '20px',
+        fontFamily: '"JetBrains Mono", "Courier New", monospace',
+        fontSize: '15px',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* CRT Scanline Effect */}
       <div style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
-        backgroundSize: '100% 2px, 3px 100%',
+        top: 0, left: 0, width: '100%', height: '100%',
+        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03))',
+        backgroundSize: '100% 3px, 4px 100%',
         pointerEvents: 'none',
         zIndex: 10
       }} />
+      
+      {/* CRT Flicker/Static Effect */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, width: '100%', height: '100%',
+        backgroundColor: 'rgba(51, 255, 51, 0.02)',
+        pointerEvents: 'none',
+        animation: 'flicker 0.15s infinite',
+        zIndex: 9
+      }} />
+
+      <style>{`
+        @keyframes flicker {
+          0% { opacity: 0.9; }
+          100% { opacity: 1.0; }
+        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #33ff3344; border-radius: 10px; }
+      `}</style>
 
       <div 
         ref={scrollRef}
         style={{
           flex: 1,
           overflowY: 'auto',
-          marginBottom: '10px',
-          paddingRight: '10px'
+          paddingBottom: '20px',
         }}
       >
+        <div style={{ opacity: 0.8, fontSize: '12px', marginBottom: '10px' }}>
+          RETRO TERMINAL KIOSK INTERFACE V1.0.4
+          <br />
+          BUILD: 2026.04.29.DEV
+          <hr style={{ border: 'none', borderTop: '1px solid #33ff3322' }} />
+        </div>
+
         {history.map((line, i) => (
-          <div key={i} style={{ 
-            color: getLineColor(line.type), 
-            marginBottom: '4px',
-            whiteSpace: 'pre-wrap',
-            textShadow: `0 0 5px ${getLineColor(line.type)}88`
-          }}>
-            {line.type === 'input' ? '$ ' : ''}{line.text}
+          <div key={i} style={{ marginBottom: '4px', wordBreak: 'break-all' }}>
+            {line.type === 'input' && <span style={{ marginRight: '8px' }}>$</span>}
+            <span style={{ 
+              color: line.type === 'system' ? TERMINAL_THEME.system : 
+                     line.type === 'error' ? TERMINAL_THEME.error : 
+                     line.type === 'input' ? TERMINAL_THEME.input : TERMINAL_THEME.text,
+              textShadow: line.type === 'output' ? '0 0 8px rgba(51, 255, 51, 0.5)' : 'none'
+            }}>
+              {line.text}
+            </span>
           </div>
         ))}
+        
+        {!isBooting && (
+          <form onSubmit={handleCommand} style={{ display: 'flex', marginTop: '4px' }}>
+            <span style={{ marginRight: '8px', color: TERMINAL_THEME.input }}>$</span>
+            <input
+              ref={inputRef}
+              autoFocus
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: TERMINAL_THEME.input,
+                fontFamily: 'inherit',
+                fontSize: 'inherit',
+                outline: 'none',
+                flex: 1,
+                padding: 0,
+              }}
+            />
+          </form>
+        )}
       </div>
 
-      <form onSubmit={handleCommand} style={{ display: 'flex', alignItems: 'center' }}>
-        <span style={{ marginRight: '8px', color: 'white' }}>$</span>
-        <input
-          autoFocus
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          style={{
-            flex: 1,
-            backgroundColor: 'transparent',
-            border: 'none',
-            color: 'white',
-            fontFamily: 'inherit',
-            fontSize: '16px',
-            outline: 'none',
-            textShadow: '0 0 5px rgba(255,255,255,0.5)'
-          }}
-        />
-      </form>
+      <div style={{ 
+        marginTop: '10px', 
+        fontSize: '11px', 
+        opacity: 0.5, 
+        display: 'flex', 
+        justifyContent: 'space-between' 
+      }}>
+        <span>STATUS: {isBooting ? 'BOOTING...' : 'ONLINE'}</span>
+        <span>LATENCY: 42ms</span>
+        <span>APK_BUILD: artifacts/RetroTerminal.apk</span>
+      </div>
     </div>
   );
 }
