@@ -176,9 +176,9 @@ function App() {
         }}
       >
         <div style={{ opacity: 0.8, fontSize: '12px', marginBottom: '10px' }}>
-          RETRO TERMINAL KIOSK INTERFACE V1.0.4
+          RETRO TERMINAL KIOSK INTERFACE V1.0.5
           <br />
-          BUILD: 2026.04.29.DEV
+          BUILD: 2026.04.29.DEPLOY_FIX
           <hr style={{ border: 'none', borderTop: '1px solid #33ff3322' }} />
         </div>
 
